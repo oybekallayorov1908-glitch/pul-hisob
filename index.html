@@ -1,0 +1,464 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Pul hisobi</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Pul hisobi">
+<meta name="theme-color" content="#1f8a5b">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<style>
+:root {
+  --bg: #f2f2f7; --card: #ffffff; --text: #1c1c1e; --muted: #8e8e93; --line: #e5e5ea;
+  --green: #1f8a5b; --red: #d93a3a; --blue: #2f6fd6; --chip: #eef0f4; --accent: #1f8a5b;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #000000; --card: #1c1c1e; --text: #f2f2f7; --muted: #8e8e93; --line: #2c2c2e;
+    --green: #34c77b; --red: #ff6461; --blue: #5b9bff; --chip: #2c2c2e; --accent: #34c77b;
+  }
+}
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { margin: 0; background: var(--bg); color: var(--text);
+  font: 16px/1.35 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+body { padding: env(safe-area-inset-top) 0 calc(150px + env(safe-area-inset-bottom)); overscroll-behavior-y: none; }
+button { font: inherit; color: inherit; border: 0; background: none; cursor: pointer; }
+input, select { font: inherit; font-size: 16px; color: var(--text); }
+.wrap { max-width: 560px; margin: 0 auto; padding: 0 16px; }
+.hidden { display: none !important; }
+
+header { padding: 14px 0 6px; }
+.title { font-size: 15px; color: var(--muted); margin: 0; }
+.total { font-size: 34px; font-weight: 700; margin: 2px 0 4px; letter-spacing: -0.5px; }
+.total small, .money small { font-size: .55em; font-weight: 600; color: var(--muted); }
+
+.banner { background: #fff4d6; color: #6b4e00; border-radius: 12px; padding: 10px 12px; margin: 12px 0 0;
+  display: flex; gap: 10px; align-items: center; font-size: 14px; }
+@media (prefers-color-scheme: dark) { .banner { background: #3a2f10; color: #ffd98a; } }
+.banner button { margin-left: auto; font-weight: 600; text-decoration: underline; white-space: nowrap; }
+
+.monthbar { display: flex; align-items: center; justify-content: space-between; margin: 16px 0 8px; }
+.monthbar button { width: 40px; height: 40px; border-radius: 20px; background: var(--card); font-size: 20px; }
+.monthbar h2 { font-size: 18px; margin: 0; }
+.sum3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 8px; }
+.sum3 div { background: var(--card); border-radius: 12px; padding: 8px 10px; }
+.sum3 span { display: block; font-size: 12px; color: var(--muted); }
+.sum3 b { font-size: 15px; }
+
+.day { font-size: 13px; color: var(--muted); margin: 14px 4px 6px; text-transform: uppercase; letter-spacing: .3px; }
+.list { background: var(--card); border-radius: 14px; overflow: hidden; }
+.row { display: flex; align-items: center; gap: 12px; padding: 11px 14px; width: 100%; text-align: left; }
+.row + .row { border-top: 1px solid var(--line); }
+.dot { width: 34px; height: 34px; border-radius: 17px; flex: none; display: grid; place-items: center;
+  font-weight: 700; color: #fff; font-size: 17px; }
+.dot.in { background: var(--green); } .dot.out { background: var(--red); }
+.row .mid { flex: 1; min-width: 0; }
+.row .cat { font-weight: 600; }
+.row .sub { font-size: 13px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.amt { font-weight: 700; white-space: nowrap; }
+.amt.in { color: var(--green); } .amt.out { color: var(--red); }
+.empty { text-align: center; color: var(--muted); padding: 40px 10px; }
+
+.card { background: var(--card); border-radius: 14px; padding: 14px; margin-bottom: 12px; }
+.card h3 { margin: 0 0 10px; font-size: 16px; }
+.bar { margin: 10px 0; }
+.bar .lbl { display: flex; justify-content: space-between; font-size: 14px; gap: 8px; }
+.bar .lbl span:last-child { font-weight: 600; white-space: nowrap; }
+.bar .track { height: 8px; background: var(--chip); border-radius: 4px; margin-top: 4px; overflow: hidden; }
+.bar .fill { height: 100%; border-radius: 4px; }
+
+.btn { display: block; width: 100%; padding: 13px; border-radius: 12px; background: var(--chip); font-weight: 600; text-align: center; }
+.btn + .btn { margin-top: 8px; }
+.btn.primary { background: var(--accent); color: #fff; }
+.btn.danger { color: var(--red); }
+.hint { font-size: 13px; color: var(--muted); margin: 8px 2px 0; }
+.catlist { display: flex; flex-wrap: wrap; gap: 8px; }
+.catlist .chip { display: inline-flex; align-items: center; gap: 6px; background: var(--chip); border-radius: 16px; padding: 6px 6px 6px 12px; font-size: 14px; }
+.catlist .chip button { width: 22px; height: 22px; border-radius: 11px; background: rgba(127,127,127,.25); font-size: 14px; line-height: 1; }
+.addcat { display: flex; gap: 8px; margin-top: 10px; }
+.addcat input { flex: 1; min-width: 0; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--bg); }
+.addcat button { padding: 0 16px; border-radius: 10px; background: var(--accent); color: #fff; font-weight: 600; }
+
+.actions { position: fixed; left: 0; right: 0; bottom: calc(58px + env(safe-area-inset-bottom)); padding: 8px 0; }
+.actions .wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.actions button { padding: 14px 0; border-radius: 14px; color: #fff; font-weight: 700; font-size: 17px; box-shadow: 0 4px 14px rgba(0,0,0,.15); }
+.actions .in { background: var(--green); } .actions .out { background: var(--red); }
+nav.tabs { position: fixed; left: 0; right: 0; bottom: 0; background: var(--card); border-top: 1px solid var(--line);
+  padding-bottom: env(safe-area-inset-bottom); }
+nav.tabs .wrap { display: grid; grid-template-columns: repeat(3, 1fr); }
+nav.tabs button { padding: 9px 0 10px; font-size: 12px; color: var(--muted); }
+nav.tabs button b { display: block; font-size: 20px; line-height: 1.2; }
+nav.tabs button.on { color: var(--accent); }
+
+.sheet-bg { position: fixed; inset: 0; background: rgba(0,0,0,.4); z-index: 10; display: flex; align-items: flex-end; }
+.sheet { background: var(--bg); width: 100%; max-width: 560px; margin: 0 auto; border-radius: 18px 18px 0 0;
+  padding: 14px 16px calc(16px + env(safe-area-inset-bottom)); max-height: 92vh; overflow-y: auto; }
+.seg { display: grid; grid-template-columns: 1fr 1fr; background: var(--chip); border-radius: 10px; padding: 3px; margin-bottom: 14px; }
+.seg button { padding: 8px 0; border-radius: 8px; font-weight: 600; font-size: 15px; }
+.seg button.on { background: var(--card); box-shadow: 0 1px 3px rgba(0,0,0,.15); }
+.field { background: var(--card); border-radius: 12px; padding: 8px 14px; margin-bottom: 10px; }
+.field label { display: block; font-size: 12px; color: var(--muted); }
+.field input, .field select { width: 100%; border: 0; background: none; padding: 4px 0; outline: none; -webkit-appearance: none; appearance: none; }
+.field input.big { font-size: 30px; font-weight: 700; }
+.cats { display: flex; flex-wrap: wrap; gap: 8px; margin: 2px 0 12px; }
+.cats button { background: var(--card); border-radius: 16px; padding: 7px 12px; font-size: 14px; border: 1.5px solid transparent; }
+.cats button.on { border-color: var(--accent); color: var(--accent); font-weight: 600; }
+.err { color: var(--red); font-size: 14px; min-height: 18px; margin: 0 2px 6px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <p class="title">Umumiy balans</p>
+    <div class="total" id="total">0</div>
+    <div class="banner hidden" id="backupBanner">
+      <span id="backupText"></span>
+      <button id="bannerBackup">Saqlash</button>
+    </div>
+  </header>
+
+  <div class="monthbar" id="monthbar">
+    <button id="prevM" aria-label="Oldingi oy">‹</button>
+    <h2 id="monthTitle"></h2>
+    <button id="nextM" aria-label="Keyingi oy">›</button>
+  </div>
+
+  <section id="view-home">
+    <div class="sum3">
+      <div><span>Kirim</span><b class="amt in" id="mIn">0</b></div>
+      <div><span>Chiqim</span><b class="amt out" id="mOut">0</b></div>
+      <div><span>Farq</span><b id="mDiff">0</b></div>
+    </div>
+    <div id="txList"></div>
+  </section>
+
+  <section id="view-report" class="hidden"></section>
+
+  <section id="view-settings" class="hidden">
+    <div class="card">
+      <h3>Zaxira nusxa</h3>
+      <button class="btn primary" id="exportBtn">Nusxani faylga saqlash</button>
+      <button class="btn" id="importBtn">Nusxadan tiklash</button>
+      <input type="file" id="importFile" accept=".json,application/json" class="hidden">
+      <p class="hint" id="lastBackup"></p>
+      <p class="hint">Faylni «Fayllar» yoki iCloud Drive'ga saqlang. Ilova ikonkasini o'chirsangiz, ma'lumotlar ham o'chadi — nusxa shuning uchun kerak.</p>
+    </div>
+    <div class="card">
+      <h3>Kirim kategoriyalari</h3>
+      <div class="catlist" id="catsIn"></div>
+      <div class="addcat"><input id="newCatIn" placeholder="Yangi kategoriya" maxlength="30"><button data-add="in">+</button></div>
+    </div>
+    <div class="card">
+      <h3>Chiqim kategoriyalari</h3>
+      <div class="catlist" id="catsOut"></div>
+      <div class="addcat"><input id="newCatOut" placeholder="Yangi kategoriya" maxlength="30"><button data-add="out">+</button></div>
+    </div>
+    <div class="card">
+      <button class="btn danger" id="wipeBtn">Barcha ma'lumotlarni o'chirish</button>
+    </div>
+  </section>
+</div>
+
+<div class="actions" id="actions">
+  <div class="wrap">
+    <button class="in" data-new="in">+ Kirim</button>
+    <button class="out" data-new="out">− Chiqim</button>
+  </div>
+</div>
+
+<nav class="tabs">
+  <div class="wrap">
+    <button data-tab="home" class="on"><b>☰</b>Amallar</button>
+    <button data-tab="report"><b>◔</b>Hisobot</button>
+    <button data-tab="settings"><b>⚙</b>Sozlamalar</button>
+  </div>
+</nav>
+
+<div class="sheet-bg hidden" id="sheetBg">
+  <form class="sheet" id="form" autocomplete="off">
+    <div class="seg" id="typeSeg">
+      <button type="button" data-type="in">Kirim</button>
+      <button type="button" data-type="out">Chiqim</button>
+    </div>
+    <div class="field">
+      <label for="fAmount">Summa, so'm</label>
+      <input id="fAmount" class="big" inputmode="numeric" placeholder="0">
+    </div>
+    <div class="title" id="catLbl" style="margin:4px 2px 6px">Qayerdan keldi?</div>
+    <div class="cats" id="fCats"></div>
+    <div class="field">
+      <label for="fNote">Izoh</label>
+      <input id="fNote" placeholder="masalan: Aliga qarz" maxlength="120">
+    </div>
+    <div class="field">
+      <label for="fDate">Sana</label>
+      <input id="fDate" type="date">
+    </div>
+    <div class="err" id="fErr"></div>
+    <button class="btn primary" type="submit">Saqlash</button>
+    <button class="btn danger hidden" type="button" id="fDelete">O'chirish</button>
+    <button class="btn" type="button" id="fCancel">Bekor qilish</button>
+  </form>
+</div>
+
+<script>
+'use strict';
+const KEY = 'pulHisobi.v1';
+const MONTHS = ['Yanvar','Fevral','Mart','Aprel','May','Iyun','Iyul','Avgust','Sentabr','Oktabr','Noyabr','Dekabr'];
+const DEFAULT_CATS = {
+  in: ["Ish haqi","Qo'shimcha ish","Sovg'a","Qarz oldim","Qarz qaytarildi","Boshlang'ich qoldiq","Boshqa"],
+  out: ["Oziq-ovqat","Transport","Aloqa/Internet","Kommunal","Kiyim","Uy-ro'zg'or","Sog'liq","Ta'lim","Ko'ngilochar","Qarz berdim","Qarz to'ladim","Boshqa"]
+};
+const PALETTE = ['#d93a3a','#e8833a','#d9b13a','#4caf50','#2f9e9e','#2f6fd6','#7a5cd6','#c44fa8','#8d6e63','#607d8b','#9e9d24','#00897b'];
+const BACKUP_DAYS = 7;
+
+// ---------- ma'lumotlar ----------
+function load() {
+  try {
+    const s = JSON.parse(localStorage.getItem(KEY));
+    if (s && Array.isArray(s.tx)) return normalize(s);
+  } catch (e) {}
+  return { v: 1, tx: [], cats: JSON.parse(JSON.stringify(DEFAULT_CATS)), lastBackup: null };
+}
+function normalize(s) {
+  return {
+    v: 1,
+    tx: s.tx.filter(t => t && ['in','out'].includes(t.type) && Number.isFinite(t.amount) && /^\d{4}-\d{2}-\d{2}$/.test(t.date)),
+    cats: { in: Array.isArray(s.cats?.in) ? s.cats.in : DEFAULT_CATS.in.slice(), out: Array.isArray(s.cats?.out) ? s.cats.out : DEFAULT_CATS.out.slice() },
+    lastBackup: s.lastBackup || null
+  };
+}
+let state = load();
+function save() {
+  try { localStorage.setItem(KEY, JSON.stringify(state)); return true; }
+  catch (e) { alert("Saqlab bo'lmadi: telefon xotirasi to'lgan bo'lishi mumkin."); return false; }
+}
+if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => {});
+
+// ---------- yordamchilar ----------
+const $ = id => document.getElementById(id);
+const pad = n => String(n).padStart(2, '0');
+const today = () => { const d = new Date(); return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); };
+const fmt = n => (n < 0 ? '−' : '') + String(Math.abs(Math.round(n))).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+const money = n => fmt(n) + " <small>so'm</small>";
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+const dayTitle = d => { const [y, m, dd] = d.split('-').map(Number); return dd + '-' + MONTHS[m - 1].toLowerCase() + (y !== new Date().getFullYear() ? ' ' + y : ''); };
+
+let month = today().slice(0, 7);
+let tab = 'home';
+
+// ---------- ko'rinish ----------
+function balance() { return state.tx.reduce((s, t) => s + (t.type === 'in' ? t.amount : -t.amount), 0); }
+function monthTx() { return state.tx.filter(t => t.date.startsWith(month)); }
+
+function render() {
+  $('total').innerHTML = money(balance());
+
+  const [y, m] = month.split('-').map(Number);
+  $('monthTitle').textContent = MONTHS[m - 1] + ' ' + y;
+
+  const days = state.lastBackup ? Math.floor((Date.now() - state.lastBackup) / 864e5) : null;
+  const needBackup = state.tx.length > 0 && (days === null || days >= BACKUP_DAYS);
+  $('backupBanner').classList.toggle('hidden', !needBackup);
+  $('backupText').textContent = days === null ? "Hali zaxira nusxa olinmagan." : days + " kundan beri zaxira nusxa olinmagan.";
+  $('lastBackup').textContent = state.lastBackup ? "Oxirgi nusxa: " + new Date(state.lastBackup).toLocaleString('ru-RU') : "Hali nusxa olinmagan.";
+
+  for (const s of ['home','report','settings']) $('view-' + s).classList.toggle('hidden', s !== tab);
+  $('monthbar').classList.toggle('hidden', tab === 'settings');
+  $('actions').classList.toggle('hidden', tab !== 'home');
+  document.querySelectorAll('nav.tabs button').forEach(x => x.classList.toggle('on', x.dataset.tab === tab));
+
+  if (tab === 'home') renderHome();
+  if (tab === 'report') renderReport();
+  if (tab === 'settings') renderSettings();
+}
+
+function renderHome() {
+  const list = monthTx();
+  let inc = 0, out = 0;
+  for (const t of list) { if (t.type === 'in') inc += t.amount; if (t.type === 'out') out += t.amount; }
+  $('mIn').textContent = fmt(inc);
+  $('mOut').textContent = fmt(out);
+  $('mDiff').textContent = fmt(inc - out);
+
+  if (!list.length) { $('txList').innerHTML = '<div class="empty">Bu oyda yozuv yo\'q.<br>Pastdagi «+ Kirim» yoki «− Chiqim» tugmasini bosing.</div>'; return; }
+  list.sort((a, b) => b.date.localeCompare(a.date) || b.ts - a.ts);
+  let html = '', cur = null;
+  for (const t of list) {
+    if (t.date !== cur) { if (cur) html += '</div>'; cur = t.date; html += '<div class="day">' + dayTitle(t.date) + '</div><div class="list">'; }
+    const sign = t.type === 'in' ? '+' : '−';
+    html += '<button class="row" data-id="' + t.id + '"><div class="dot ' + t.type + '">' + sign + '</div>' +
+      '<div class="mid"><div class="cat">' + esc(t.cat) + '</div>' + (t.note ? '<div class="sub">' + esc(t.note) + '</div>' : '') + '</div>' +
+      '<div class="amt ' + t.type + '">' + sign + fmt(t.amount) + '</div></button>';
+  }
+  $('txList').innerHTML = html + '</div>';
+}
+
+function bars(type, list) {
+  const sums = {};
+  let total = 0;
+  for (const t of list) if (t.type === type) { sums[t.cat] = (sums[t.cat] || 0) + t.amount; total += t.amount; }
+  const rows = Object.entries(sums).sort((a, b) => b[1] - a[1]);
+  if (!rows.length) return '<p class="hint">Yozuv yo\'q.</p>';
+  const max = rows[0][1];
+  return rows.map(([c, v], i) =>
+    '<div class="bar"><div class="lbl"><span>' + esc(c) + ' <span style="color:var(--muted)">' + Math.round(v * 100 / total) + '%</span></span><span>' + fmt(v) + '</span></div>' +
+    '<div class="track"><div class="fill" style="width:' + (v * 100 / max) + '%;background:' + (type === 'in' ? 'var(--green)' : PALETTE[i % PALETTE.length]) + '"></div></div></div>'
+  ).join('');
+}
+function renderReport() {
+  const list = monthTx();
+  let inc = 0, out = 0;
+  for (const t of list) { if (t.type === 'in') inc += t.amount; if (t.type === 'out') out += t.amount; }
+  $('view-report').innerHTML =
+    '<div class="sum3"><div><span>Kirim</span><b class="amt in">' + fmt(inc) + '</b></div><div><span>Chiqim</span><b class="amt out">' + fmt(out) +
+    '</b></div><div><span>Farq</span><b>' + fmt(inc - out) + '</b></div></div>' +
+    '<div class="card"><h3>Pul qayerga ketdi</h3>' + bars('out', list) + '</div>' +
+    '<div class="card"><h3>Pul qayerdan keldi</h3>' + bars('in', list) + '</div>';
+}
+
+function renderSettings() {
+  for (const type of ['in', 'out']) {
+    $(type === 'in' ? 'catsIn' : 'catsOut').innerHTML = state.cats[type].map((c, i) =>
+      '<span class="chip">' + esc(c) + '<button data-del-cat="' + type + ':' + i + '" aria-label="O\'chirish">×</button></span>').join('');
+  }
+}
+
+// ---------- forma ----------
+let editId = null, fType = 'out', fCat = null;
+
+function openForm(type, tx) {
+  editId = tx ? tx.id : null;
+  fType = tx ? tx.type : type;
+  fCat = tx ? tx.cat : null;
+  $('fAmount').value = tx ? fmt(tx.amount) : '';
+  $('fNote').value = tx ? tx.note || '' : '';
+  $('fDate').value = tx ? tx.date : (month === today().slice(0, 7) ? today() : month + '-01');
+  $('fDelete').classList.toggle('hidden', !tx);
+  $('fErr').textContent = '';
+  formType(fType);
+  $('sheetBg').classList.remove('hidden');
+  if (!tx) setTimeout(() => $('fAmount').focus(), 50);
+}
+function formType(type) {
+  if (type !== fType) fCat = null;
+  fType = type;
+  document.querySelectorAll('#typeSeg button').forEach(b => b.classList.toggle('on', b.dataset.type === type));
+  $('catLbl').textContent = type === 'in' ? 'Pul qayerdan keldi?' : 'Pul qayerga ketdi?';
+  const cats = state.cats[type].slice();
+  if (fCat && !cats.includes(fCat)) cats.push(fCat);
+  $('fCats').innerHTML = cats.map(c => '<button type="button" class="' + (c === fCat ? 'on' : '') + '" data-cat="' + esc(c) + '">' + esc(c) + '</button>').join('');
+}
+function closeForm() { $('sheetBg').classList.add('hidden'); document.activeElement && document.activeElement.blur(); }
+
+$('fAmount').addEventListener('input', e => {
+  const digits = e.target.value.replace(/\D/g, '').replace(/^0+/, '').slice(0, 13);
+  e.target.value = digits ? fmt(Number(digits)) : '';
+});
+$('typeSeg').addEventListener('click', e => { const b = e.target.closest('[data-type]'); if (b) formType(b.dataset.type); });
+$('fCats').addEventListener('click', e => {
+  const b = e.target.closest('[data-cat]'); if (!b) return;
+  fCat = b.dataset.cat;
+  $('fCats').querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b));
+});
+$('fCancel').addEventListener('click', closeForm);
+$('sheetBg').addEventListener('click', e => { if (e.target === $('sheetBg')) closeForm(); });
+$('fDelete').addEventListener('click', () => {
+  if (!confirm("Bu yozuv o'chirilsinmi?")) return;
+  state.tx = state.tx.filter(t => t.id !== editId);
+  save(); closeForm(); render();
+});
+$('form').addEventListener('submit', e => {
+  e.preventDefault();
+  const amount = Number($('fAmount').value.replace(/\D/g, ''));
+  const date = $('fDate').value;
+  if (!amount) return void ($('fErr').textContent = 'Summani kiriting.');
+  if (!fCat) return void ($('fErr').textContent = 'Kategoriyani tanlang.');
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return void ($('fErr').textContent = 'Sanani tanlang.');
+  const tx = { id: editId || uid(), type: fType, amount, cat: fCat, date, note: $('fNote').value.trim(), ts: Date.now() };
+  if (editId) {
+    const old = state.tx.find(t => t.id === editId);
+    tx.ts = old ? old.ts : tx.ts;
+    state.tx = state.tx.map(t => t.id === editId ? tx : t);
+  } else state.tx.push(tx);
+  save();
+  month = date.slice(0, 7);
+  closeForm(); render();
+});
+
+// ---------- zaxira nusxa ----------
+async function exportBackup() {
+  const name = 'pul-hisobi-' + today() + '.json';
+  const data = JSON.stringify({ app: 'pul-hisobi', exported: new Date().toISOString(), ...state, lastBackup: undefined }, null, 1);
+  const file = new File([data], name, { type: 'application/json' });
+  try {
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      await navigator.share({ files: [file], title: name });
+    } else {
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(file); a.download = name;
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+    }
+    state.lastBackup = Date.now(); save(); render();
+  } catch (err) {
+    if (err && err.name === 'AbortError') return;
+    alert("Nusxani saqlab bo'lmadi: " + (err && err.message || err));
+  }
+}
+$('exportBtn').addEventListener('click', exportBackup);
+$('bannerBackup').addEventListener('click', exportBackup);
+$('importBtn').addEventListener('click', () => $('importFile').click());
+$('importFile').addEventListener('change', async e => {
+  const f = e.target.files[0]; e.target.value = '';
+  if (!f) return;
+  try {
+    const s = JSON.parse(await f.text());
+    if (!s || !Array.isArray(s.tx)) throw new Error("bu Pul hisobi fayli emas");
+    const n = normalize(s);
+    if (!confirm("Fayldagi " + n.tx.length + " ta yozuv tiklansinmi? Hozirgi " + state.tx.length + " ta yozuv almashtiriladi.")) return;
+    n.lastBackup = Date.now();
+    state = n; save(); render();
+    alert('Tiklandi: ' + n.tx.length + ' ta yozuv.');
+  } catch (err) { alert("Faylni o'qib bo'lmadi: " + err.message); }
+});
+
+// ---------- sozlamalar ----------
+document.querySelectorAll('[data-add]').forEach(b => b.addEventListener('click', () => {
+  const type = b.dataset.add, inp = $(type === 'in' ? 'newCatIn' : 'newCatOut'), v = inp.value.trim();
+  if (!v) return;
+  if (state.cats[type].some(c => c.toLowerCase() === v.toLowerCase())) return alert('Bunday kategoriya bor.');
+  state.cats[type].push(v); inp.value = ''; save(); render();
+}));
+$('view-settings').addEventListener('click', e => {
+  const b = e.target.closest('[data-del-cat]'); if (!b) return;
+  const [type, i] = b.dataset.delCat.split(':');
+  const name = state.cats[type][i];
+  if (!confirm("«" + name + "» kategoriyasi ro'yxatdan olib tashlansinmi? Eski yozuvlar o'zgarmaydi.")) return;
+  state.cats[type].splice(Number(i), 1); save(); render();
+});
+$('wipeBtn').addEventListener('click', () => {
+  if (!confirm("Barcha yozuvlar o'chiriladi. Avval zaxira nusxa olganmisiz?")) return;
+  if (!confirm('Rostdan ham hammasini o\'chirasizmi? Qaytarib bo\'lmaydi.')) return;
+  state = { v: 1, tx: [], cats: JSON.parse(JSON.stringify(DEFAULT_CATS)), lastBackup: null };
+  save(); render();
+});
+
+// ---------- navigatsiya ----------
+document.querySelectorAll('[data-new]').forEach(b => b.addEventListener('click', () => openForm(b.dataset.new)));
+document.querySelectorAll('[data-tab]').forEach(b => b.addEventListener('click', () => { tab = b.dataset.tab; render(); window.scrollTo(0, 0); }));
+$('txList').addEventListener('click', e => { const r = e.target.closest('[data-id]'); if (r) openForm(null, state.tx.find(t => t.id === r.dataset.id)); });
+function shiftMonth(d) { const [y, m] = month.split('-').map(Number); const dt = new Date(y, m - 1 + d, 1); month = dt.getFullYear() + '-' + pad(dt.getMonth() + 1); render(); }
+$('prevM').addEventListener('click', () => shiftMonth(-1));
+$('nextM').addEventListener('click', () => shiftMonth(1));
+
+render();
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
+</script>
+</body>
+</html>
